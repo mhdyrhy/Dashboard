@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه جامع مدیریت پورتفوی و مولدسازی دارایی‌ها | بنیاد شهید و امور ایثارگران</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#0a1628',
+                            900: '#0f2342',
+                            800: '#17335e',
+                            700: '#214780',
+                        },
+                        emerald: {
+                            650: '#057a55',
+                        },
+                        gold: {
+                            500: '#d97706',
+                            400: '#f59e0b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f4f6f9;
+            color: #1e293b;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #0f2342 0%, #1e3a8a 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 35, 66, 0.25);
+        }
+        .card-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -8px rgba(15, 35, 66, 0.12);
+        }
+        .chain-step-arrow::after {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent #cbd5e1 transparent transparent;
+        }
+        @media (max-width: 1024px) {
+            .chain-step-arrow::after {
+                display: none;
+            }
+        }
+        /* کلاس‌های از پیش تعریف‌شده برای رنگ‌های مرحله پروژه (رفع مشکل Tailwind CDN) */
+        .stage-emerald { background-color: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .stage-amber   { background-color: #fffbeb; color: #b45309; border-color: #fde68a; }
+        .stage-blue    { background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+        .stage-navy    { background-color: #0f2342; color: #fbbf24; border-color: #1e3a8a; }
+    </style>
+</head>
+<body class="antialiased selection:bg-navy-800 selection:text-white">
+
+    <!-- نوار اعلان‌ها -->
+    <div id="toastContainer" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+    <!-- هدر -->
+    <header class="bg-gradient-to-l from-navy-950 via-navy-900 to-navy-800 text-white shadow-lg sticky top-0 z-40 border-b border-navy-700/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3.5 gap-3">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-inner shrink-0 border border-amber-300/40">
+                        <i class="ph-fill ph-buildings text-navy-950 text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">
+                                سامانه جامع مدیریت پورتفوی و مولدسازی دارایی‌ها
+                            </h1>
+                            <span class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2.5 py-0.5 rounded-full font-medium">
+                                منطبق با دستورالعمل جامع آبان ۱۴۰۵
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-0.5">
+                            بنیاد شهید و امور ایثارگران | اداره کل امور اقتصادی و مجامع و سازمان اقتصادی کوثر (PMO)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 border-navy-700/60 pt-2.5 md:pt-0">
+                    <div class="hidden sm:flex flex-col text-left">
+                        <span class="text-[11px] text-amber-300 font-semibold flex items-center gap-1 justify-end">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            درگاه واحد تصمیم‌گیری کمیته عالی
+                        </span>
+                        <span class="text-[11px] text-slate-300">دوره گزارش‌دهی: پاییز ۱۴۰۵</span>
+                    </div>
+                    <button onclick="openNewAssetModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer">
+                        <i class="ph-bold ph-plus-circle text-lg"></i>
+                        <span>ثبت شناسنامه دارایی / طرح</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ناوبری تب‌ها -->
+            <nav class="flex items-center gap-1.5 overflow-x-auto pb-3 pt-1 no-scrollbar" aria-label="تب‌های اصلی سامانه">
+                <button onclick="switchTab('assets')" id="tab-btn-assets" class="tab-btn tab-active whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-duotone ph-coins text-lg"></i>
+                    <span>دارایی‌ها (ارزش بالقوه)</span>
+                    <span class="bg-white/20 text-white text-[11px] px-2 py-0.5 rounded-full" id="badge-assets-count">۸</span>
+                </button>
+
+                <button onclick="switchTab('projects')" id="tab-btn-projects" class="tab-btn bg-navy-800/70 hover:bg-navy-700 text-slate-200 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-duotone ph-kanban text-lg"></i>
+                    <span>پروژه‌ها (زنجیره ارزش)</span>
+                </button>
+
+                <button onclick="switchTab('resolutions')" id="tab-btn-resolutions" class="tab-btn bg-navy-800/70 hover:bg-navy-700 text-slate-200 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-duotone ph-gavel text-lg"></i>
+                    <span>مصوبات کمیته</span>
+                    <span class="bg-amber-500/30 text-amber-200 text-[11px] px-2 py-0.5 rounded-full">۱۰ مصوبه پایه</span>
+                </button>
+
+                <button onclick="switchTab('under-review')" id="tab-btn-under-review" class="tab-btn bg-navy-800/70 hover:bg-navy-700 text-slate-200 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-duotone ph-hourglass-high text-lg"></i>
+                    <span>پروژه‌های در دست بررسی</span>
+                    <span class="bg-rose-500/30 text-rose-200 text-[11px] px-2 py-0.5 rounded-full" id="badge-review-count">۴</span>
+                </button>
+
+                <button onclick="switchTab('organizations')" id="tab-btn-organizations" class="tab-btn bg-navy-800/70 hover:bg-navy-700 text-slate-200 whitespace-nowrap px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-duotone ph-buildings text-lg"></i>
+                    <span>سازمان‌ها و پروژه‌های در دست اجرا</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- بنر اصل راهبردی -->
+        <div class="bg-white border-r-4 border-amber-500 rounded-2xl p-4 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl shrink-0">
+                    <i class="ph-fill ph-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xs sm:text-sm font-extrabold text-navy-900">
+                        اصل راهبردی دستورالعمل مولدسازی: «دارایی باید به خدمت، ارزش و ظرفیت پایدار تبدیل شود»
+                    </h2>
+                    <p class="text-xs text-slate-600 mt-0.5">
+                        تقدم ارزش‌افزایی حقوقی، ثبتی و شهرسازی بر معامله | ممنوعیت فروش خام دارایی و مصرف عواید در هزینه‌های جاری دائمی (ماده ۲ و ۹)
+                    </p>
+                </div>
+            </div>
+            <button onclick="openRedLinesModal()" class="text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shrink-0 self-end sm:self-center cursor-pointer">
+                <i class="ph-bold ph-warning-octagon text-base"></i>
+                <span>مشاهده خط قرمزهای دهگانه</span>
+            </button>
+        </div>
+
+        <!-- ==================== تب ۱: دارایی‌ها ==================== -->
+        <section id="view-assets" class="tab-view space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gradient-to-br from-navy-900 to-navy-800 text-white rounded-2xl p-5 shadow-md card-hover relative overflow-hidden">
+                    <div class="absolute -left-4 -bottom-4 opacity-10">
+                        <i class="ph-fill ph-trend-up text-8xl"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 rounded-lg">شاخص محوری پورتفوی</span>
+                        <i class="ph-duotone ph-sparkle text-amber-400 text-xl"></i>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-3">ارزش دارایی‌های بالقوه برای مولدسازی (پس از ارزش‌افزایی)</p>
+                    <div class="flex items-baseline gap-1.5 mt-1">
+                        <span id="kpi-potential-value" class="text-2xl sm:text-3xl font-black text-white">۶۸,۴۵۰</span>
+                        <span class="text-xs text-emerald-300 font-bold">میلیارد تومان</span>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px]">
+                        <span class="text-emerald-300 font-bold flex items-center gap-1">
+                            <i class="ph-bold ph-arrow-up-right"></i>
+                            +۷۸٪ خلق ارزش افزوده
+                        </span>
+                        <span class="text-slate-300">نسبت به ارزش وضع موجود</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 card-hover">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500">ارزش پایه (وضع موجود)</span>
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                            <i class="ph-duotone ph-scales text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 mt-3">
+                        <span id="kpi-current-value" class="text-2xl sm:text-3xl font-black text-navy-900">۳۸,۴۲۰</span>
+                        <span class="text-xs text-slate-500 font-bold">میلیارد تومان</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                        <span>مبتنی بر ارزیابی کارشناسان رسمی</span>
+                        <span class="text-blue-700 font-bold">۱۴۲ پرونده فعال</span>
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 card-hover">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500">خلق ارزش خالص پیش‌بینی‌شده</span>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                            <i class="ph-duotone ph-chart-line-up text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 mt-3">
+                        <span id="kpi-added-value" class="text-2xl sm:text-3xl font-black text-emerald-700">۳۰,۰۳۰</span>
+                        <span class="text-xs text-slate-500 font-bold">میلیارد تومان</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                        <span>تغییر کاربری، افزایش تراکم، تثبیت سند</span>
+                        <span class="text-emerald-700 font-bold">اصل دوم دستورالعمل</span>
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 card-hover">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500">نرخ صیانت و حفظ مالکیت</span>
+                        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i class="ph-duotone ph-shield-star text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 mt-3">
+                        <span class="text-2xl sm:text-3xl font-black text-navy-900">۸۶.۵٪</span>
+                        <span class="text-xs text-amber-600 font-bold">مشارکت، اجاره و مأموریتی</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                        <span>واگذاری قطعی مازاد: فقط ۱۳.۵٪</span>
+                        <span class="text-amber-700 font-bold">صیانت بین‌نسلی</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- نمودارها -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-extrabold text-navy-900">
+                                مقایسه ارزش وضع موجود در برابر ارزش بالقوه مولدسازی (به تفکیک حوزه)
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                تأثیر اقدامات حلقه سوم زنجیره ارزش بر ارزش دارایی‌ها (میلیارد تومان)
+                            </p>
+                        </div>
+                        <span class="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold self-start">
+                            رشد میانگین ۱.۷۸ برابری
+                        </span>
+                    </div>
+                    <div class="h-72 w-full">
+                        <canvas id="potentialValueChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-navy-900">
+                            سهم طبقات هفت‌گانه پورتفوی دارایی‌ها (ماده ۳)
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            توزیع ارزش بالقوه دارایی‌ها بر اساس اهمیت راهبردی و بازده اقتصادی
+                        </p>
+                    </div>
+                    <div class="h-60 w-full my-2 flex items-center justify-center">
+                        <canvas id="portfolioCategoriesChart"></canvas>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-3 text-[11px] text-slate-600 flex items-center justify-between">
+                        <span>بیشترین سهم: <strong>ورود به سبد مسکن ایثارگران (۳۲٪)</strong></span>
+                        <span class="text-navy-800 font-bold">۲۱,۹۰۰ میلیارد تومان</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول دارایی‌ها -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-extrabold text-navy-900">
+                                بانک اطلاعات یکپارچه و شناسنامه استاندارد دارایی‌های بالقوه
+                            </h3>
+                            <span class="text-xs bg-navy-900 text-white px-2.5 py-0.5 rounded-full font-bold">کد یکتای دارایی</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">
+                            فهرست دارایی‌های مشمول مولدسازی (کلیک روی هر ردیف برای مشاهده شناسنامه کامل)
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <div class="relative flex-1 sm:flex-initial">
+                            <i class="ph ph-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="assetSearchInput" onkeyup="filterAssets()" placeholder="جستجو نام، کد یکتا، استان..." class="w-full sm:w-56 pr-9 pl-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                        </div>
+                        <select id="assetCategoryFilter" onchange="filterAssets()" class="text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-navy-800">
+                            <option value="all">همه طبقات هفت‌گانه</option>
+                            <option value="ورود به سبد مسکن ایثارگران">۳- ورود به سبد مسکن ایثارگران</option>
+                            <option value="مشارکت یا اجاره بلندمدت">۴- مشارکت یا اجاره بلندمدت</option>
+                            <option value="حفظ و ارتقای بهره‌وری">۱- حفظ و ارتقای بهره‌وری</option>
+                            <option value="توسعه برای استفاده مأموریتی">۲- توسعه برای استفاده مأموریتی</option>
+                            <option value="تهاتر یا جایگزینی هدفمند">۵- تهاتر یا جایگزینی هدفمند</option>
+                            <option value="نگهداری تا رفع موانع حقوقی">۶- نگهداری تا رفع موانع حقوقی</option>
+                            <option value="واگذاری هدفمند دارایی مازاد">۷- واگذاری هدفمند دارایی مازاد</option>
+                        </select>
+                        <button onclick="resetAssetsData()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-300" title="بازنشانی داده‌ها به حالت اولیه">
+                            بازنشانی داده‌ها
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100/80 text-slate-600 text-xs font-bold border-b border-slate-200">
+                                <th class="py-3.5 px-4">کد یکتا</th>
+                                <th class="py-3.5 px-4">عنوان دارایی و موقعیت</th>
+                                <th class="py-3.5 px-4">متولی / سازمان</th>
+                                <th class="py-3.5 px-4">طبقه پورتفوی (ماده ۳)</th>
+                                <th class="py-3.5 px-4">ارزش وضع موجود</th>
+                                <th class="py-3.5 px-4">ارزش بالقوه مولدسازی</th>
+                                <th class="py-3.5 px-4">رشد ارزش</th>
+                                <th class="py-3.5 px-4">وضعیت حقوقی/ثبتی</th>
+                                <th class="py-3.5 px-4 text-center">شناسنامه</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetsTableBody" class="divide-y divide-slate-100 text-xs">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== تب ۲: پروژه‌ها ==================== -->
+        <section id="view-projects" class="tab-view hidden space-y-6">
+            <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                    <div>
+                        <h3 class="text-base font-extrabold text-navy-900">
+                            زنجیره ارزش پنج‌حلقه‌ای مولدسازی دارایی‌ها (ماده ۳ دستورالعمل)
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            پایش لحظه‌ای جریان تبدیل دارایی‌های راکد و کم‌بازده به مسکن، خدمت و جریان درآمد پایدار
+                        </p>
+                    </div>
+                    <span class="text-xs font-bold bg-navy-50 text-navy-800 px-3 py-1.5 rounded-xl border border-navy-200">
+                        مجموع کل پرونده‌های پورتفوی: ۱۴۲ دارایی
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="relative bg-slate-50 border border-slate-200 rounded-2xl p-4 chain-step-arrow">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-lg bg-navy-900 text-white text-xs font-black flex items-center justify-center">۱</span>
+                            <span class="text-[11px] font-bold text-slate-500">شناسایی و ثبت</span>
+                        </div>
+                        <h4 class="text-sm font-extrabold text-navy-900">دارایی</h4>
+                        <p class="text-[11px] text-slate-600 mt-1">شناسایی زمین، ساختمان، حقوق و صدور کد یکتا</p>
+                        <div class="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
+                            <span class="text-xl font-black text-navy-900">۱۴۲</span>
+                            <span class="text-[11px] text-slate-500">دارایی شناسنامه‌دار</span>
+                        </div>
+                    </div>
+
+                    <div class="relative bg-blue-50/60 border border-blue-200 rounded-2xl p-4 chain-step-arrow">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-lg bg-blue-700 text-white text-xs font-black flex items-center justify-center">۲</span>
+                            <span class="text-[11px] font-bold text-blue-700">ممیزی حقوقی</span>
+                        </div>
+                        <h4 class="text-sm font-extrabold text-navy-900">آماده‌سازی</h4>
+                        <p class="text-[11px] text-slate-600 mt-1">تثبیت سند، رفع معارض، رفع موانع ثبتی و مجوزی</p>
+                        <div class="mt-3 pt-2.5 border-t border-blue-200/70 flex items-baseline justify-between">
+                            <span class="text-xl font-black text-blue-800">۹۸</span>
+                            <span class="text-[11px] text-blue-700">دارایی آماده تصمیم</span>
+                        </div>
+                    </div>
+
+                    <div class="relative bg-amber-50/60 border border-amber-200 rounded-2xl p-4 chain-step-arrow">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-lg bg-amber-600 text-white text-xs font-black flex items-center justify-center">۳</span>
+                            <span class="text-[11px] font-bold text-amber-700">تقدم ارزش‌افزایی</span>
+                        </div>
+                        <h4 class="text-sm font-extrabold text-navy-900">خلق ارزش</h4>
+                        <p class="text-[11px] text-slate-600 mt-1">اخذ مجوز، افزایش تراکم، تغییر کاربری و تجمیع</p>
+                        <div class="mt-3 pt-2.5 border-t border-amber-200/70 flex items-baseline justify-between">
+                            <span class="text-xl font-black text-amber-700">۶۴</span>
+                            <span class="text-[11px] text-amber-700">+۷۸٪ افزایش ارزش</span>
+                        </div>
+                    </div>
+
+                    <div class="relative bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 chain-step-arrow">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-lg bg-emerald-600 text-white text-xs font-black flex items-center justify-center">۴</span>
+                            <span class="text-[11px] font-bold text-emerald-700">اجرای سناریو</span>
+                        </div>
+                        <h4 class="text-sm font-extrabold text-navy-900">تبدیل</h4>
+                        <p class="text-[11px] text-slate-600 mt-1">ساخت مسکن، مشارکت، اجاره بلندمدت و تهاتر</p>
+                        <div class="mt-3 pt-2.5 border-t border-emerald-200/70 flex items-baseline justify-between">
+                            <span class="text-xl font-black text-emerald-700">۴۱</span>
+                            <span class="text-[11px] text-emerald-700">پروژه فعال اجرایی</span>
+                        </div>
+                    </div>
+
+                    <div class="relative bg-gradient-to-br from-navy-900 to-navy-800 text-white rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-lg bg-amber-400 text-navy-950 text-xs font-black flex items-center justify-center">۵</span>
+                            <span class="text-[11px] font-bold text-amber-300">تحویل نتیجه</span>
+                        </div>
+                        <h4 class="text-sm font-extrabold text-white">اثر نهایی</h4>
+                        <p class="text-[11px] text-slate-300 mt-1">تحویل مسکن ایثارگران، مراکز خدماتی و درآمد پایدار</p>
+                        <div class="mt-3 pt-2.5 border-t border-white/15 flex items-baseline justify-between">
+                            <span class="text-xl font-black text-emerald-300">۱۸</span>
+                            <span class="text-[11px] text-slate-300">طرح به بهره‌برداری رسیده</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIها -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                            <i class="ph-fill ph-house-line text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-extrabold text-navy-900">اثر مسکن جامعه ایثارگری</h4>
+                            <span class="text-[11px] text-slate-500">موضوع بند (۸) ماده ۸ و جدول KPI</span>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span class="text-2xl font-black text-emerald-700">۱۲,۴۵۰ واحد</span>
+                        <span class="text-xs font-bold text-slate-600">در ۱۴ پروژه مسکن</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                        <div class="bg-emerald-600 h-full rounded-full" style="width: 68%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2">تطبیق جغرافیایی عرضه زمین‌های مستعد با تقاضای مسکن ایثارگران</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                            <i class="ph-fill ph-hospital text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-extrabold text-navy-900">اثر خدماتی، درمانی و رفاهی</h4>
+                            <span class="text-[11px] text-slate-500">ارتقای ظرفیت مراکز مأموریتی</span>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span class="text-2xl font-black text-blue-800">+۴۲٪ ظرفیت</span>
+                        <span class="text-xs font-bold text-slate-600">۹ مجتمع توان‌بخشی و اقامتی</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                        <div class="bg-blue-600 h-full rounded-full" style="width: 74%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2">تأمین مالی از محل تهاتر هدفمند دارایی‌های مازاد و غیرمولد</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                            <i class="ph-fill ph-coins text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-extrabold text-navy-900">جریان درآمد پایدار سالانه</h4>
+                            <span class="text-[11px] text-slate-500">اجاره بلندمدت، مشارکت و صندوق‌ها</span>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span class="text-2xl font-black text-amber-700">۴,۸۲۰ میلیارد ت</span>
+                        <span class="text-xs font-bold text-emerald-700">+۱۱۵٪ رشد سالانه</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                        <div class="bg-amber-500 h-full rounded-full" style="width: 81%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2">سرمایه‌گذاری مجدد ۱۰۰٪ عواید در طرح‌های مولد (عدم مصرف در جاری)</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                <h3 class="text-base font-extrabold text-navy-900 mb-4">فهرست پروژه‌های جامع مولدسازی در سبد پورتفوی</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="projectsCardsGrid"></div>
+            </div>
+        </section>
+
+        <!-- ==================== تب ۳: مصوبات ==================== -->
+        <section id="view-resolutions" class="tab-view hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="bg-navy-900 text-white rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center gap-2 text-amber-300 text-xs font-bold mb-2">
+                        <i class="ph-fill ph-crown text-lg"></i>
+                        <span>ارکان شورای راهبری (کمیته عالی مولدسازی)</span>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-200 mt-3">
+                        <li class="flex justify-between border-b border-white/10 pb-1.5">
+                            <span class="text-slate-400">رئیس کمیته:</span>
+                            <span class="font-bold">معاون رئیس‌جمهور و ریاست عالی بنیاد</span>
+                        </li>
+                        <li class="flex justify-between border-b border-white/10 pb-1.5">
+                            <span class="text-slate-400">نایب‌رئیس و مدیر طرح:</span>
+                            <span class="font-bold">مدیرعامل سازمان اقتصادی کوثر</span>
+                        </li>
+                        <li class="flex justify-between border-b border-white/10 pb-1.5">
+                            <span class="text-slate-400">دبیر کمیته:</span>
+                            <span class="font-bold">مدیرکل امور اقتصادی و مجامع بنیاد</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-slate-400">ناظر عالی:</span>
+                            <span class="font-bold">مدیرکل بازرسی و ارزیابی عملکرد</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <h4 class="text-sm font-extrabold text-navy-900 flex items-center gap-2">
+                        <i class="ph-duotone ph-scales text-blue-700 text-xl"></i>
+                        ضوابط رسمیت جلسات و اعتبار مصوبات (ماده ۷)
+                    </h4>
+                    <ul class="space-y-2 text-xs text-slate-600 mt-3 list-disc list-inside">
+                        <li>رسمیت جلسه با حضور رئیس کمیته و حداقل <strong>نصف به علاوه یک</strong> اعضا</li>
+                        <li>ممنوعیت رأی ممتنع: اعضا الزاماً باید رأی <strong>موافق یا مخالف</strong> دهند</li>
+                        <li>ابلاغ صورتجلسات توسط دبیرخانه حداکثر ظرف <strong>۳ روز کاری</strong></li>
+                        <li>الزام طرح در کمیته برای معاملات بیش از <strong>۲۵ برابر</strong> حد نصاب متوسط دولتی</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <h4 class="text-sm font-extrabold text-navy-900 flex items-center gap-2">
+                        <i class="ph-duotone ph-bell-ringing text-rose-600 text-xl"></i>
+                        پایش ترک فعل و ضمانت اجرایی (ماده ۵ و ۱۱)
+                    </h4>
+                    <div class="mt-3 space-y-2.5 text-xs">
+                        <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                            <span class="text-emerald-900 font-bold">مصوبات اجرا شده در موعد مقرر</span>
+                            <span class="text-emerald-700 font-black text-sm">۸۸٪</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
+                            <span class="text-amber-900 font-bold">در مهلت ابلاغ (۳ روز کاری)</span>
+                            <span class="text-amber-700 font-black text-sm">۳ مصوبه</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between">
+                            <span class="text-rose-900 font-bold">اخطار تأخیر (گزارش به بازرسی)</span>
+                            <span class="text-rose-700 font-black text-sm">۱ مورد</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-base font-extrabold text-navy-900">مصوبات ابلاغی کمیته عالی مولدسازی دارایی‌ها</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">شامل مصوبات پرونده‌های تصمیم دارایی‌ها و وضعیت اجرای آن‌ها</p>
+                    </div>
+                    <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-xl font-bold">
+                        آرای اعضا: شفاف (بدون رأی ممتنع)
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/80 text-slate-600 font-bold border-b border-slate-200">
+                                <th class="py-3.5 px-4">شماره مصوبه</th>
+                                <th class="py-3.5 px-4">تاریخ جلسه</th>
+                                <th class="py-3.5 px-4">موضوع و سناریوی مصوب</th>
+                                <th class="py-3.5 px-4">مجری / دستگاه مسئول</th>
+                                <th class="py-3.5 px-4">نتیجه آرا</th>
+                                <th class="py-3.5 px-4">وضعیت اجرا</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resolutionsTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                <h3 class="text-sm sm:text-base font-extrabold text-navy-900 mb-3">
+                    وضعیت استقرار مصوبات دهگانه الزامی آغاز طرح جامع (ماده ۵ بند ب)
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="tenMandatoryResolutions"></div>
+            </div>
+        </section>
+
+        <!-- ==================== تب ۴: در دست بررسی ==================== -->
+        <section id="view-under-review" class="tab-view hidden space-y-6">
+            <div class="bg-gradient-to-l from-amber-50 to-white border border-amber-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="p-3 bg-amber-100 text-amber-700 rounded-xl shrink-0">
+                        <i class="ph-duotone ph-timer text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-navy-900">
+                            کارتابل پرونده‌های تصمیم و طرح‌های توجیهی در دست بررسی دبیرخانه و کمیته تخصصی
+                        </h3>
+                        <p class="text-xs text-slate-600 mt-1">
+                            مطابق بند ۶ و ۷ ماده (۷)، طرح‌های ارسالی حداکثر ظرف <strong>یک ماه (۳۰ روز)</strong> بررسی می‌شوند و طرح‌های دارای اولویت زمانی ویژه <strong>خارج از نوبت</strong> در دستور کار قرار می‌گیرند.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-bold bg-rose-100 text-rose-800 px-3 py-1.5 rounded-xl border border-rose-200">
+                        ۱ پرونده دارای اولویت خارج از نوبت
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="underReviewGrid"></div>
+        </section>
+
+        <!-- ==================== تب ۵: سازمان‌ها ==================== -->
+        <section id="view-organizations" class="tab-view hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-navy-900 text-amber-400 flex items-center justify-center shrink-0">
+                        <i class="ph-fill ph-strategy text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-extrabold text-navy-900">نقش سازمان اقتصادی کوثر (مدیر یکپارچه طرح - PMO)</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            راهبری یکپارچه طرح، ممیزی فنی و اقتصادی، تهیه بسته‌های سرمایه‌گذاری و نظارت بر اجرای پروژه‌ها در سطح سازمان‌ها و استان‌ها با رعایت استقلال ارکان قانونی شرکت‌های سهامی (بانک دی و بیمه دی - تبصره ۷).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-start gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                        <i class="ph-fill ph-map-pin-area text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-extrabold text-navy-900">مشوق اختصاصی استان‌های پایلوت (حداقل ۷۰٪ عواید استانی)</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            مطابق بند ۲ ماده (۹)، حداقل <strong>۷۰ درصد</strong> از منابع حاصل از مولدسازی دارایی‌های هر استان با تصویب کمیته، در همان استان با اولویت تأمین مسکن و مراکز درمانی و رفاهی ایثارگران هزینه می‌شود.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-navy-900">
+                            ارزیابی عملکرد مولدسازی سازمان‌ها، شرکت‌های تابعه و استان‌های پایلوت
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            مقایسه ارزش پورتفوی در دست اجرا و درصد تحقق نقاط عطف زمانی (شاخص ارزیابی سالانه مدیران - ماده ۱۱)
+                        </p>
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="organizationsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-5 border-b border-slate-200">
+                    <h3 class="text-base font-extrabold text-navy-900">
+                        پروژه‌های در دست اجرا به تفکیک سازمان‌ها، شرکت‌ها و استان‌های پایلوت
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/80 text-slate-600 font-bold border-b border-slate-200">
+                                <th class="py-3.5 px-4">سازمان / شرکت / استان</th>
+                                <th class="py-3.5 px-4">عنوان پروژه اجرایی</th>
+                                <th class="py-3.5 px-4">شیوه مولدسازی (ماده ۳)</th>
+                                <th class="py-3.5 px-4">ارزش قرارداد / طرح</th>
+                                <th class="py-3.5 px-4">پیشرفت فیزیکی</th>
+                                <th class="py-3.5 px-4">پیشرفت ریالی</th>
+                                <th class="py-3.5 px-4">عواید اختصاصی / استانی</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orgsProjectsTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- مودال شناسنامه دارایی -->
+    <div id="assetDetailModal" class="fixed inset-0 bg-navy-950/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+            <div class="bg-gradient-to-l from-navy-900 to-navy-800 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span id="modalAssetCode" class="bg-amber-400 text-navy-950 text-xs font-black px-3 py-1 rounded-lg">AST-1405-001</span>
+                    <h3 id="modalAssetTitle" class="text-base sm:text-lg font-extrabold">عنوان دارایی</h3>
+                </div>
+                <button onclick="closeModal('assetDetailModal')" class="text-slate-300 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block">متولی / سازمان:</span>
+                        <strong id="modalAssetOrg" class="text-navy-900 mt-1 block">-</strong>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block">طبقه هفت‌گانه (ماده ۳):</span>
+                        <strong id="modalAssetCategory" class="text-blue-800 mt-1 block">-</strong>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block">ارزش وضع موجود:</span>
+                        <strong id="modalAssetCurrentVal" class="text-slate-800 mt-1 block">-</strong>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                        <span class="text-emerald-700 block">ارزش بالقوه مولدسازی:</span>
+                        <strong id="modalAssetPotentialVal" class="text-emerald-800 text-sm font-black mt-1 block">-</strong>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50/50 border border-blue-200 rounded-2xl p-4 text-xs space-y-1.5">
+                    <h4 class="font-extrabold text-navy-900 flex items-center gap-1.5">
+                        <i class="ph-fill ph-info text-blue-700 text-base"></i>
+                        اقدامات ارزش‌افزایی و وضعیت ممیزی حقوقی / شهرسازی:
+                    </h4>
+                    <p id="modalAssetDesc" class="text-slate-700 leading-relaxed">-</p>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-extrabold text-navy-900 mb-3 flex items-center gap-2">
+                        <i class="ph-duotone ph-git-branch text-amber-600 text-xl"></i>
+                        مقایسه مستند سناریوهای سه‌گانه در پرونده تصمیم (اصل چهارم دستورالعمل)
+                    </h4>
+                    <div id="modalScenariosGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"></div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span class="font-bold text-navy-900 flex items-center gap-1.5">
+                        <i class="ph-fill ph-check-circle text-emerald-600 text-lg"></i>
+                        تأییدیه انطباق با خط قرمزهای دهگانه (احراز مالکیت، ارزیابی کارشناس رسمی، عدم تضاد منافع)
+                    </span>
+                    <span class="bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-lg">تأیید شده توسط PMO</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال خط قرمزها -->
+    <div id="redLinesModal" class="fixed inset-0 bg-navy-950/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+            <div class="bg-rose-900 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="ph-fill ph-warning-octagon text-amber-300 text-2xl"></i>
+                    <h3 class="text-base font-extrabold">خط قرمزهای دهگانه مولدسازی (ممنوعیت‌های مطلق ماده ۹)</h3>
+                </div>
+                <button onclick="closeModal('redLinesModal')" class="text-rose-200 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 max-h-[75vh] overflow-y-auto">
+                <p class="text-xs text-slate-600 mb-4">
+                    رعایت موارد زیر برای کلیه ارکان، استان‌ها، سازمان‌ها، شرکت‌ها و مؤسسات تابعه الزامی است و تخطی از آن‌ها تخلف محسوب می‌گردد:
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs" id="redLinesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال ثبت دارایی جدید -->
+    <div id="newAssetModal" class="fixed inset-0 bg-navy-950/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+            <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-base font-extrabold flex items-center gap-2">
+                    <i class="ph-duotone ph-file-plus text-emerald-400 text-xl"></i>
+                    ثبت دارایی جدید و صدور کد یکتا در بانک اطلاعاتی
+                </h3>
+                <button onclick="closeModal('newAssetModal')" class="text-slate-300 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddNewAsset(event)" class="p-6 space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">عنوان ملک / دارایی *</label>
+                        <input type="text" id="newAssetTitle" required placeholder="مثلاً: زمین ۲ هکتاری بلوار امامت مشهد" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">سازمان / واحد استانی متولی *</label>
+                        <select id="newAssetOrg" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                            <option value="سازمان اموال و املاک کوثر">سازمان اموال و املاک کوثر</option>
+                            <option value="اداره کل بنیاد استان خراسان رضوی">اداره کل بنیاد استان خراسان رضوی</option>
+                            <option value="اداره کل بنیاد استان اصفهان">اداره کل بنیاد استان اصفهان</option>
+                            <option value="سازمان سیاحتی کوثر">سازمان سیاحتی کوثر</option>
+                            <option value="شرکت متد">شرکت متد</option>
+                            <option value="مؤسسه ایثار">مؤسسه ایثار</option>
+                            <option value="بانک دی">بانک دی</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">طبقه پورتفوی (ماده ۳ بند ب) *</label>
+                        <select id="newAssetCategory" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                            <option value="ورود به سبد مسکن ایثارگران">۳- ورود به سبد مسکن ایثارگران</option>
+                            <option value="مشارکت یا اجاره بلندمدت">۴- مشارکت یا اجاره بلندمدت</option>
+                            <option value="حفظ و ارتقای بهره‌وری">۱- حفظ و ارتقای بهره‌وری</option>
+                            <option value="توسعه برای استفاده مأموریتی">۲- توسعه برای استفاده مأموریتی</option>
+                            <option value="تهاتر یا جایگزینی هدفمند">۵- تهاتر یا جایگزینی هدفمند</option>
+                            <option value="نگهداری تا رفع موانع حقوقی">۶- نگهداری تا رفع موانع حقوقی</option>
+                            <option value="واگذاری هدفمند دارایی مازاد">۷- واگذاری هدفمند دارایی مازاد</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">وضعیت حقوقی و ثبتی *</label>
+                        <select id="newAssetLegal" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                            <option value="تک‌برگ تثبیت‌شده">تک‌برگ تثبیت‌شده (آماده اقدام)</option>
+                            <option value="در حال تغییر کاربری">در حال تغییر کاربری و افزایش تراکم</option>
+                            <option value="نیازمند اصلاح سند">نیازمند اصلاح حدود و اخذ سند</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">ارزش وضع موجود (میلیارد تومان) *</label>
+                        <input type="number" id="newAssetCurrent" required min="10" placeholder="مثلاً: 1200" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">ارزش بالقوه پس از ارزش‌افزایی (میلیارد تومان) *</label>
+                        <input type="number" id="newAssetPotential" required min="10" placeholder="مثلاً: 2450" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">شرح اقدامات ارزش‌افزایی و سناریوی پیشنهادی</label>
+                    <textarea id="newAssetDesc" rows="2" placeholder="توضیح تغییر کاربری، افزایش تراکم، مشارکت ساخت مسکن ایثارگران و..." class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-navy-800"></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+                    <button type="button" onclick="closeModal('newAssetModal')" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer">انصراف</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-sm cursor-pointer">ثبت و صدور کد یکتا</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // داده‌های اولیه (دیتابیس مجازی)
+        // برای ویرایش دیتابیس: این آرایه‌ها را تغییر دهید.
+        // در نسخه refined، assetsData در localStorage ذخیره می‌شود.
+        // =========================================================================
+
+        const INITIAL_ASSETS = [
+            {
+                id: 'AST-1405-101',
+                title: 'اراضی ۱۸ هکتاری پردیس شرق تهران (حکیمیه)',
+                org: 'سازمان اموال و املاک کوثر',
+                category: 'ورود به سبد مسکن ایثارگران',
+                currentVal: 6400,
+                potentialVal: 13800,
+                legalStatus: 'تک‌برگ تثبیت‌شده',
+                legalBadge: 'emerald',
+                desc: 'الحاق به محدوده شهری، تغییر کاربری از بایر/صنعتی به مسکونی-خدماتی با تراکم ۳۲۰٪ و تأمین ۳,۲۰۰ واحد مسکن جامعه ایثارگری بدون فروش خام زمین.',
+                scenarios: [
+                    { name: 'سناریو ۱: فروش خام وضع موجود', returnVal: '۶,۴۰۰ میلیارد ت', status: 'رد شده (مغایر اصل اول)', selected: false },
+                    { name: 'سناریو ۲: تغییر کاربری و مشارکت ساخت مسکن ایثارگران', returnVal: '۱۳,۸۰۰ میلیارد ت + ۳,۲۰۰ واحد', status: 'سناریوی مصوب کمیته', selected: true },
+                    { name: 'سناریو ۳: واگذاری حق بهره‌برداری تجاری صرف', returnVal: '۹,۲۰۰ میلیارد ت', status: 'عدم پوشش هدف مسکن', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-102',
+                title: 'مجتمع تجاری-اداری و اقامتی میدان فردوسی مشهد',
+                org: 'سازمان سیاحتی کوثر',
+                category: 'مشارکت یا اجاره بلندمدت',
+                currentVal: 4800,
+                potentialVal: 8950,
+                legalStatus: 'تک‌برگ تثبیت‌شده',
+                legalBadge: 'emerald',
+                desc: 'تجمیع پلاک‌های مجاور، افزایش تراکم طبقات تجاری و هتل آپارتمان ایثارگران و انعقاد قرارداد اجاره به شرط بهره‌برداری ۱۵ ساله با حفظ ۱۰۰٪ مالکیت بنیاد.',
+                scenarios: [
+                    { name: 'سناریو ۱: ادامه بهره‌برداری سنتی فعلی', returnVal: '۴,۸۰۰ میلیارد ت', status: 'بازده پایین (کمتر از ۳٪)', selected: false },
+                    { name: 'سناریو ۲: تجمیع، افزایش تراکم و اجاره بلندمدت BOT', returnVal: '۸,۹۵۰ میلیارد ت + درآمد سالانه ۴۲۰ م.ت', status: 'سناریوی مصوب کمیته', selected: true },
+                    { name: 'سناریو ۳: تهاتر با املاک مسکونی', returnVal: '۷,۱۰۰ میلیارد ت', status: 'کاهش دارایی درآمدزا', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-103',
+                title: 'باغ‌شهر و اراضی ذخیره ۱۰ هکتاری صفائیه اصفهان',
+                org: 'اداره کل بنیاد استان اصفهان',
+                category: 'ورود به سبد مسکن ایثارگران',
+                currentVal: 3900,
+                potentialVal: 7400,
+                legalStatus: 'در حال تغییر کاربری',
+                legalBadge: 'amber',
+                desc: 'تعیین تکلیف پهنه در کمیسیون ماده ۵، تفکیک قطعات و اختصاص ۷۰٪ عواید حاصل به ساخت مسکن و کلینیک تخصصی جانبازان استان اصفهان (بند ۲ ماده ۹).',
+                scenarios: [
+                    { name: 'سناریو ۱: نگهداری راکد', returnVal: '۳,۹۰۰ میلیارد ت', status: 'تحمیل هزینه حفاظت', selected: false },
+                    { name: 'سناریو ۲: افراز، اخذ پروانه و مشارکت ساخت مسکن استانی', returnVal: '۷,۴۰۰ میلیارد ت (۷۰٪ سهم استان)', status: 'سناریوی مصوب کمیته', selected: true },
+                    { name: 'سناریو ۳: مزایده نقدی کل زمین', returnVal: '۴,۵۰۰ میلیارد ت', status: 'مغایر خط قرمز دوم', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-104',
+                title: 'ساختمان مرکزی سابق و انبارهای لجستیک جاده مخصوص',
+                org: 'شرکت متد',
+                category: 'تهاتر یا جایگزینی هدفمند',
+                currentVal: 3200,
+                potentialVal: 5600,
+                legalStatus: 'تک‌برگ تثبیت‌شده',
+                legalBadge: 'emerald',
+                desc: 'اخذ گواهی استاندارد و تغییر کاربری به هاب سلامت و تجهیزات پزشکی، سپس تهاتر هدفمند برای تکمیل و تجهیز ۳ بیمارستان فوق‌تخصصی توان‌بخشی.',
+                scenarios: [
+                    { name: 'سناریو ۱: اجاره کوتاه‌مدت انبار', returnVal: '۳,۲۰۰ میلیارد ت', status: 'فرسودگی مستحدثات', selected: false },
+                    { name: 'سناریو ۲: ارتقای استاندارد و تهاتر هدفمند تکمیل مراکز درمانی', returnVal: '۵,۶۰۰ میلیارد ت', status: 'سناریوی مصوب کمیته', selected: true },
+                    { name: 'سناریو ۳: صندوق زمین و ساختمان', returnVal: '۴,۹۰۰ میلیارد ت', status: 'زمان‌بر بودن نقدشوندگی', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-105',
+                title: 'مجتمع فرهنگی-ورزشی و آب‌درمانی سرعین',
+                org: 'مؤسسه ایثار',
+                category: 'توسعه برای استفاده مأموریتی',
+                currentVal: 2150,
+                potentialVal: 3850,
+                legalStatus: 'تک‌برگ تثبیت‌شده',
+                legalBadge: 'emerald',
+                desc: 'توسعه فاز دوم توان‌بخشی، اخذ نماد کیفیت و سیب سلامت، و واگذاری مدیریت بهره‌برداری به بخش خصوصی با حفظ سهمیه خدمات رایگان ایثارگران.',
+                scenarios: [
+                    { name: 'سناریو ۱: مدیریت دولتی مستقیم با زیان عملیاتی', returnVal: '۲,۱۵۰ میلیارد ت', status: 'عدم بهره‌وری', selected: false },
+                    { name: 'سناریو ۲: توسعه مأموریتی و برون‌سپاری بهره‌برداری رقابتی', returnVal: '۳,۸۵۰ میلیارد ت', status: 'سناریوی مصوب کمیته', selected: true },
+                    { name: 'سناریو ۳: تغییر کاربری به مجتمع مسکونی', returnVal: '۳,۱۰۰ میلیارد ت', status: 'تضعیف مأموریت درمانی', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-106',
+                title: 'برج اداری-تجاری بلوار میرداماد (املاک تملیکی)',
+                org: 'بانک دی',
+                category: 'حفظ و ارتقای بهره‌وری',
+                currentVal: 5400,
+                potentialVal: 8200,
+                legalStatus: 'تک‌برگ تثبیت‌شده',
+                legalBadge: 'emerald',
+                desc: 'بازآرایی فضاهای اداری، اخذ پایان‌کار نهایی، راه‌اندازی صندوق املاک و مستغلات در بازار سرمایه (بند ۹ ماده ۳) با رعایت ضوابط بورس و قانون تجارت.',
+                scenarios: [
+                    { name: 'سناریو ۱: فروش بلوکی در مزایده', returnVal: '۵,۴۰۰ میلیارد ت', status: 'رکود معاملات کلان', selected: false },
+                    { name: 'سناریو ۲: تأسیس صندوق املاک و مستغلات در بازار سرمایه', returnVal: '۸,۲۰۰ میلیارد ت', status: 'سناریوی مصوب هیئت‌مدیره و کمیته', selected: true },
+                    { name: 'سناریو ۳: اجاره واحدهای اداری', returnVal: '۶,۱۰۰ میلیارد ت', status: 'بازده کمتر نسبت به صندوق', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-107',
+                title: 'زمین ۱۴ هکتاری شهرک صدرا شیراز (دارای معارض جزئی)',
+                org: 'اداره کل بنیاد استان فارس',
+                category: 'نگهداری تا رفع موانع حقوقی',
+                currentVal: 2900,
+                potentialVal: 6100,
+                legalStatus: 'نیازمند اصلاح سند',
+                legalBadge: 'rose',
+                desc: 'در مرحله ممیزی حقوقی (گام سوم): رفع تداخل حدود ثبتی با منابع طبیعی و صدور سند تک‌برگ جدید جهت ورود به سبد مسکن ایثارگران استان فارس.',
+                scenarios: [
+                    { name: 'سناریو ۱: هرگونه معامله قبل از رفع معارض', returnVal: 'غیرمجاز', status: 'ممنوع (خط قرمز چهارم)', selected: false },
+                    { name: 'سناریو ۲: تثبیت کامل سند و ورود به فاز مسکن ایثارگران', returnVal: '۶,۱۰۰ میلیارد ت', status: 'در دست اقدام حقوقی', selected: true },
+                    { name: 'سناریو ۳: معاوضه با اراضی راه و شهرسازی', returnVal: '۵,۲۰۰ میلیارد ت', status: 'گزینه جایگزین', selected: false }
+                ]
+            },
+            {
+                id: 'AST-1405-108',
+                title: 'قطعات پراکنده تجاری و مسکونی مازاد در حومه کرج',
+                org: 'سازمان اموال و املاک کوثر',
+                category: 'واگذاری هدفمند دارایی مازاد',
+                currentVal: 1450,
+                potentialVal: 2350,
+                legalStatus: 'تک‌برگ تثبیت‌شده',
+                legalBadge: 'emerald',
+                desc: 'پس از اخذ سند تک‌برگ و تفکیک قطعات، به عنوان آخرین گزینه (طبقه ۷) از طریق مزایده عمومی شفاف واگذار و منابع آن مستقیماً به پروژه مسکن ایثارگران البرز تزریق می‌شود.',
+                scenarios: [
+                    { name: 'سناریو ۱: نگهداری قطعات کوچک پراکنده', returnVal: '۱,۴۵۰ میلیارد ت', status: 'هزینه نگهداری بالا', selected: false },
+                    { name: 'سناریو ۲: تکمیل سند و واگذاری هدفمند در مزایده عمومی', returnVal: '۲,۳۵۰ میلیارد ت', status: 'سناریوی مصوب کمیته', selected: true },
+                    { name: 'سناریو ۳: مشارکت مجزا برای هر قطعه', returnVal: '۱,۸۰۰ میلیارد ت', status: 'فاقد توجیه اقتصادی', selected: false }
+                ]
+            }
+        ];
+
+        // بارگذاری از localStorage یا استفاده از داده اولیه
+        let assetsData = JSON.parse(localStorage.getItem('moladsazi_assets') || 'null') || structuredClone(INITIAL_ASSETS);
+
+        const projectsChainData = [
+            {
+                code: 'PRJ-1405-01',
+                title: 'شهرک مسکونی ایثار (فاز ۱ و ۲ حکیمیه تهران)',
+                stage: 'حلقه ۴: تبدیل (در حال ساخت)',
+                stageColor: 'emerald',
+                method: 'مشارکت با توسعه‌گر معتبر + صندوق زمین و ساختمان',
+                output: 'تأمین ۳,۲۰۰ واحد مسکونی ایثارگران',
+                progress: 62,
+                valueCreated: '+۷,۴۰۰ میلیارد تومان'
+            },
+            {
+                code: 'PRJ-1405-02',
+                title: 'توسعه و نوسازی مجتمع اقامتی و تجاری مشهد',
+                stage: 'حلقه ۳: خلق ارزش (اخذ تراکم)',
+                stageColor: 'amber',
+                method: 'تجمیع پلاک‌ها، افزایش تراکم و اجاره بلندمدت',
+                output: 'افزایش ۴۵۰ تخت اقامتی + درآمد پایدار سالانه',
+                progress: 48,
+                valueCreated: '+۴,۱۵۰ میلیارد تومان'
+            },
+            {
+                code: 'PRJ-1405-03',
+                title: 'پایلوت استانی مسکن و کلینیک جانبازان اصفهان',
+                stage: 'حلقه ۴: تبدیل (انعقاد قرارداد)',
+                stageColor: 'emerald',
+                method: 'تغییر کاربری و تخصیص ۷۰٪ عواید به استان اصفهان',
+                output: '۱,۴۵۰ واحد مسکن + مرکز توان‌بخشی',
+                progress: 55,
+                valueCreated: '+۳,۵۰۰ میلیارد تومان'
+            },
+            {
+                code: 'PRJ-1405-04',
+                title: 'صندوق املاک و مستغلات کوثر و بانک دی (بازار سرمایه)',
+                stage: 'حلقه ۵: اثر نهایی (پذیره‌نویسی)',
+                stageColor: 'blue',
+                method: 'ابزارهای نوین مالی بازار سرمایه (بند ۹ ماده ۳)',
+                output: 'جذب سرمایه مردمی و حفظ کنترل راهبردی',
+                progress: 85,
+                valueCreated: '+۲,۸۰۰ میلیارد تومان'
+            }
+        ];
+
+        const resolutionsData = [
+            {
+                num: '۱۴۰۵/ک‌م/۰۱۴',
+                date: '۱۴۰۵/۰۸/۱۲',
+                subject: 'تصویب سناریوی مشارکت ساخت ۳,۲۰۰ واحد مسکن ایثارگران در اراضی حکیمیه تهران',
+                executor: 'سازمان اقتصادی کوثر و سازمان اموال و املاک',
+                votes: 'موافق: ۱۰ | مخالف: ۰ | ممتنع: ۰',
+                status: 'ابلاغ شده و در حال اجرا',
+                statusType: 'emerald'
+            },
+            {
+                num: '۱۴۰۵/ک‌م/۰۱۳',
+                date: '۱۴۰۵/۰۸/۰۵',
+                subject: 'تخصیص ۷۰٪ عواید حاصل از مولدسازی اراضی صفائیه به سبد مسکن ایثارگران استان اصفهان',
+                executor: 'اداره کل بنیاد استان اصفهان و معاونت توسعه مدیریت',
+                votes: 'موافق: ۹ | مخالف: ۱ | ممتنع: ۰',
+                status: 'ابلاغ ظرف ۳ روز کاری (اجرایی)',
+                statusType: 'emerald'
+            },
+            {
+                num: '۱۴۰۵/ک‌م/۰۱۲',
+                date: '۱۴۰۵/۰۷/۲۶',
+                subject: 'الزام به تکمیل شناسنامه استاندارد و کد یکتای کلیه املاک راکد استان‌های پایلوت',
+                executor: 'کلیه مدیران کل استان‌های پایلوت و شرکت‌های تابعه',
+                votes: 'موافق: ۱۰ | مخالف: ۰ | ممتنع: ۰',
+                status: '۱ مورد تأخیر (ارسال گزارش به بازرسی)',
+                statusType: 'rose'
+            },
+            {
+                num: '۱۴۰۵/ک‌م/۰۱۱',
+                date: '۱۴۰۵/۰۷/۱۸',
+                subject: 'تأیید بسته کاری مستقل تأسیس صندوق املاک و مستغلات با مشارکت بانک دی و بیمه دی',
+                executor: 'هیئت‌مدیره بانک دی، بیمه دی و سازمان اقتصادی کوثر',
+                votes: 'موافق: ۹ | مخالف: ۰ | ممتنع: ۰',
+                status: 'در حال طی تشریفات قانونی بورس',
+                statusType: 'amber'
+            }
+        ];
+
+        const tenMandatoryList = [
+            '۱. تصویب اصل اجرای طرح جامع مولدسازی',
+            '۲. تعیین رسمی کارفرما، مجری (کوثر) و حدود اختیارات',
+            '۳. الزام واحدهای ستادی و استانی به ارائه کامل اسناد',
+            '۴. تصویب الگوی بانک اطلاعات و شناسنامه استاندارد',
+            '۵. ایجاد درگاه واحد تصمیم‌گیری (کمیته عالی)',
+            '۶. ممنوعیت مطلق معامله خارج از فرآیند مصوب',
+            '۷. تصویب اجرای پایلوت در ۵ استان منتخب',
+            '۸. تصویب سیاست مصرف و سرمایه‌گذاری مجدد منابع',
+            '۹. تعیین سازوکار رقابتی انتخاب ارزیابان و شرکا',
+            '۱۰. تصویب نظام گزارش‌دهی، حسابرسی و تضاد منافع'
+        ];
+
+        const underReviewData = [
+            {
+                code: 'REV-1405-08',
+                title: 'طرح توجیهی اراضی ۸ هکتاری بلوار وکیل‌آباد مشهد',
+                sender: 'اداره کل بنیاد استان خراسان رضوی',
+                daysLeft: 6,
+                urgent: true,
+                auditStatus: 'تکمیل ممیزی حقوقی و ارزیابی کارشناس رسمی',
+                currentVal: '۴,۲۰۰ میلیارد تومان',
+                potentialVal: '۷,۹۰۰ میلیارد تومان',
+                scenarios: [
+                    'سناریو ۱ (پیشنهادی PMO): تغییر کاربری مختلط تجاری-مسکونی و مشارکت ساخت ۱,۱۰۰ واحد مسکن ایثارگران',
+                    'سناریو ۲: اجاره بلندمدت ۲۰ ساله به سرمایه‌گذار بخش خصوصی',
+                    'سناریو ۳: تهاتر با واحدهای مسکونی آماده در شهر جدید گلبهار'
+                ]
+            },
+            {
+                code: 'REV-1405-09',
+                title: 'پروژه نیمه‌تمام مجتمع درمانی و توان‌بخشی تبریز',
+                sender: 'مؤسسه ایثار / استان آذربایجان شرقی',
+                daysLeft: 14,
+                urgent: false,
+                auditStatus: 'در حال بررسی نهایی در کمیته تخصصی دبیرخانه',
+                currentVal: '۱,۸۵۰ میلیارد تومان',
+                potentialVal: '۳,۴۰۰ میلیارد تومان',
+                scenarios: [
+                    'سناریو ۱ (پیشنهادی): تکمیل و تجهیز مرکز از محل تهاتر ۲ ملک تجاری مازاد استان',
+                    'سناریو ۲: مشارکت عمومی-خصوصی (PPP) برای تکمیل و بهره‌برداری مشترک',
+                    'سناریو ۳: تأمین مالی از طریق انتشار اوراق صکوک اجاره'
+                ]
+            },
+            {
+                code: 'REV-1405-10',
+                title: 'مجتمع اقامتی و هتل کوثر رامسر (فاز توسعه)',
+                sender: 'سازمان سیاحتی کوثر',
+                daysLeft: 19,
+                urgent: false,
+                auditStatus: 'اخذ استعلام‌های شهرسازی و محیط زیست تکمیل شد',
+                currentVal: '۲,۶۰۰ میلیارد تومان',
+                potentialVal: '۴,۷۵۰ میلیارد تومان',
+                scenarios: [
+                    'سناریو ۱ (پیشنهادی): افزایش تراکم اقامتی، اخذ استاندارد ۵ ستاره و واگذاری حق بهره‌برداری',
+                    'سناریو ۲: مشارکت با صندوق‌های سرمایه‌گذاری گردشگری',
+                    'سناریو ۳: حفظ وضع موجود و نوسازی جزئی'
+                ]
+            },
+            {
+                code: 'REV-1405-11',
+                title: 'اراضی ذخیره صنعتی و خدماتی شهرک غرب اهواز',
+                sender: 'اداره کل بنیاد استان خوزستان',
+                daysLeft: 24,
+                urgent: false,
+                auditStatus: 'ارزیابی فنی و اقتصادی توسط ارزیاب مستقل منتخب',
+                currentVal: '۱,۹۰۰ میلیارد تومان',
+                potentialVal: '۳,۶۵۰ میلیارد تومان',
+                scenarios: [
+                    'سناریو ۱ (پیشنهادی): الحاق به بافت شهری، افراز و تخصیص به سبد مسکن ایثارگران خوزستان',
+                    'سناریو ۲: تهاتر با پیمانکاران پروژه‌های عمرانی استان',
+                    'سناریو ۳: اجاره بلندمدت انبار و خدمات پشتیبانی'
+                ]
+            }
+        ];
+
+        const orgsProjectsData = [
+            {
+                org: 'سازمان اقتصادی کوثر (PMO) و اموال کوثر',
+                project: 'تجمیع و آماده‌سازی ۱۸ پروژه کلان مسکن و تجاری کشور',
+                method: 'تغییر کاربری، افزایش تراکم و مشارکت',
+                value: '۲۲,۵۰۰ میلیارد ت',
+                physProg: 64,
+                finProg: 58,
+                share: 'حفظ مالکیت راهبردی + سرمایه‌گذاری مجدد'
+            },
+            {
+                org: 'بانک دی و بیمه دی (بسته مستقل بازار سرمایه)',
+                project: 'تأسیس صندوق املاک و مستغلات و مولدسازی املاک تملیکی',
+                method: 'نهادهای مالی بازار سرمایه (بند ۹ ماده ۳)',
+                value: '۱۲,۴۰۰ میلیارد ت',
+                physProg: 78,
+                finProg: 72,
+                share: 'مصوب هیئت‌مدیره شرکت‌ها (تبصره ۷)'
+            },
+            {
+                org: 'اداره کل بنیاد استان اصفهان (استان پایلوت)',
+                project: 'طرح مسکن ایثارگران صفائیه و مرکز توان‌بخشی',
+                method: 'افراز، تغییر کاربری و مشارکت ساخت',
+                value: '۷,۴۰۰ میلیارد ت',
+                physProg: 55,
+                finProg: 49,
+                share: '۷۰٪ عواید اختصاصی استان اصفهان (ماده ۹)'
+            },
+            {
+                org: 'سازمان سیاحتی کوثر',
+                project: 'طرح جامع ارتقای بهره‌وری و توسعه مجتمع‌های اقامتی مشهد و شمال',
+                method: 'اجاره بلندمدت و واگذاری حق بهره‌برداری',
+                value: '۸,۹۵۰ میلیارد ت',
+                physProg: 51,
+                finProg: 46,
+                share: 'جریان درآمد پایدار خدمات رفاهی ایثارگران'
+            },
+            {
+                org: 'اداره کل بنیاد استان خراسان رضوی (استان پایلوت)',
+                project: 'تبدیل اراضی راکد حاشیه مشهد به مجتمع مسکونی و خدماتی',
+                method: 'مشارکت ساخت و تهاتر هدفمند',
+                value: '۷,۹۰۰ میلیارد ت',
+                physProg: 42,
+                finProg: 38,
+                share: '۷۰٪ عواید اختصاصی استان خراسان رضوی'
+            },
+            {
+                org: 'شرکت متد و مؤسسه ایثار',
+                project: 'تکمیل و تجهیز مراکز درمانی، توان‌بخشی و آزمایشگاهی',
+                method: 'اخذ استاندارد، تهاتر هدفمند و برون‌سپاری',
+                value: '۵,۶۰۰ میلیارد ت',
+                physProg: 69,
+                finProg: 65,
+                share: 'ارتقای ۴۲٪ ظرفیت خدمات درمانی ایثارگران'
+            }
+        ];
+
+        const redLinesData = [
+            '۱. مصرف منابع حاصل از مولدسازی برای پوشش دائمی هزینه‌های جاری؛',
+            '۲. فروش خام دارایی پیش از بررسی و فعال‌سازی ظرفیت ارزش‌افزایی (حقوقی، ثبتی و شهرسازی)؛',
+            '۳. انجام هرگونه معامله یا تعهد خارج از درگاه واحد تصمیم‌گیری (کمیته مولدسازی)؛',
+            '۴. انجام معامله بدون احراز دقیق مالکیت و قابلیت انتقال قانونی؛',
+            '۵. قیمت‌گذاری دارایی‌ها بدون ارزیابی معتبر و مستقل (کارشناس رسمی / ارزیاب مستقل منتخب)؛',
+            '۶. انتخاب شریک، سرمایه‌گذار یا بهره‌بردار بدون فرآیند شفاف و رقابتی؛',
+            '۷. ترکیب منافع و عدم تفکیک نقش‌های «تصمیم‌گیر»، «ارزیاب»، «معامله‌گر» و «ناظر» (تضاد منافع)؛',
+            '۸. آغاز پروژه بدون تعیین تکلیف دقیق منابع، مصارف و ماتریس مسئولیت‌ها؛',
+            '۹. انتقال ریسک نامتعارف و یک‌طرفه به بنیاد در قراردادهای مشارکت و سرمایه‌گذاری؛',
+            '۱۰. استفاده از منابع حاصل برخلاف مصوبات کمیته و مأموریت‌های قانونی بنیاد.'
+        ];
+
+        // =========================================================================
+        // توابع کمکی و مدیریت دیتابیس
+        // =========================================================================
+
+        function toPersianDigits(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function saveAssetsToStorage() {
+            localStorage.setItem('moladsazi_assets', JSON.stringify(assetsData));
+        }
+
+        function resetAssetsData() {
+            if (confirm('آیا مطمئن هستید که می‌خواهید تمام تغییرات را به حالت اولیه برگردانید؟')) {
+                assetsData = structuredClone(INITIAL_ASSETS);
+                saveAssetsToStorage();
+                renderAssetsTable();
+                updateKPIs();
+                showToast('داده‌ها به حالت اولیه بازنشانی شد.');
+            }
+        }
+
+        // =========================================================================
+        // توابع رندر
+        // =========================================================================
+
+        function renderAssetsTable(dataList = assetsData) {
+            const tbody = document.getElementById('assetsTableBody');
+            tbody.innerHTML = '';
+
+            if (dataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500">هیچ دارایی با فیلتر انتخاب‌شده یافت نشد.</td></tr>`;
+                return;
+            }
+
+            dataList.forEach(item => {
+                const growthPercent = Math.round(((item.potentialVal - item.currentVal) / item.currentVal) * 100);
+                const badgeColors = {
+                    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    amber: 'bg-amber-50 text-amber-700 border-amber-200',
+                    rose: 'bg-rose-50 text-rose-700 border-rose-200'
+                };
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-blue-50/40 transition cursor-pointer';
+                tr.onclick = () => openAssetDetail(item.id);
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4 font-mono font-bold text-navy-800 whitespace-nowrap">${item.id}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-800">${item.title}</td>
+                    <td class="py-3.5 px-4 text-slate-600">${item.org}</td>
+                    <td class="py-3.5 px-4">
+                        <span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-medium inline-block">${item.category}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-600 font-semibold whitespace-nowrap">${toPersianDigits(item.currentVal)} م.ت</td>
+                    <td class="py-3.5 px-4 font-black text-emerald-700 whitespace-nowrap">${toPersianDigits(item.potentialVal)} م.ت</td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">
+                        <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">+${growthPercent}٪</span>
+                    </td>
+                    <td class="py-3.5 px-4 whitespace-nowrap">
+                        <span class="border px-2.5 py-1 rounded-lg font-semibold ${badgeColors[item.legalBadge]}">${item.legalStatus}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-center">
+                        <button class="text-navy-800 hover:text-blue-600 bg-navy-50 hover:bg-navy-100 p-2 rounded-xl transition" title="مشاهده شناسنامه و سناریوها">
+                            <i class="ph-bold ph-file-text text-base"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterAssets() {
+            const searchTerm = document.getElementById('assetSearchInput').value.trim().toLowerCase();
+            const categoryFilter = document.getElementById('assetCategoryFilter').value;
+
+            const filtered = assetsData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm) ||
+                                      item.id.toLowerCase().includes(searchTerm) ||
+                                      item.org.toLowerCase().includes(searchTerm);
+                const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+                return matchesSearch && matchesCategory;
+            });
+
+            renderAssetsTable(filtered);
+        }
+
+        function updateKPIs() {
+            const totalCurrent = assetsData.reduce((sum, item) => sum + item.currentVal, 0);
+            const totalPotential = assetsData.reduce((sum, item) => sum + item.potentialVal, 0);
+            const addedValue = totalPotential - totalCurrent;
+
+            const baseCurrentOffset = 8220;
+            const basePotentialOffset = 15200;
+
+            document.getElementById('kpi-current-value').textContent = toPersianDigits(totalCurrent + baseCurrentOffset);
+            document.getElementById('kpi-potential-value').textContent = toPersianDigits(totalPotential + basePotentialOffset);
+            document.getElementById('kpi-added-value').textContent = toPersianDigits(addedValue + (basePotentialOffset - baseCurrentOffset));
+            document.getElementById('badge-assets-count').textContent = assetsData.length;
+        }
+
+        function renderProjectsCards() {
+            const container = document.getElementById('projectsCardsGrid');
+            // استفاده از کلاس‌های از پیش تعریف‌شده به جای کلاس داینامیک Tailwind
+            const stageClassMap = {
+                emerald: 'stage-emerald',
+                amber: 'stage-amber',
+                blue: 'stage-blue',
+                navy: 'stage-navy'
+            };
+
+            container.innerHTML = projectsChainData.map(prj => `
+                <div class="border border-slate-200 rounded-2xl p-4 hover:border-navy-300 transition bg-slate-50/40">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="font-mono text-[11px] font-bold text-navy-800 bg-navy-100 px-2.5 py-0.5 rounded-lg">${prj.code}</span>
+                        <span class="text-[11px] font-bold border px-2.5 py-0.5 rounded-lg ${stageClassMap[prj.stageColor] || 'stage-emerald'}">${prj.stage}</span>
+                    </div>
+                    <h4 class="text-sm font-extrabold text-navy-900">${prj.title}</h4>
+                    <p class="text-xs text-slate-600 mt-1"><strong>شیوه اجرا:</strong> ${prj.method}</p>
+                    <p class="text-xs text-emerald-700 font-bold mt-1"><strong>خروجی مأموریتی:</strong> ${prj.output}</p>
+                    <div class="mt-3 pt-3 border-t border-slate-200">
+                        <div class="flex justify-between text-[11px] font-bold mb-1">
+                            <span class="text-slate-600">پیشرفت زنجیره ارزش: ${prj.progress}٪</span>
+                            <span class="text-emerald-700">ارزش افزوده: ${prj.valueCreated}</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-navy-800 h-full rounded-full" style="width: ${prj.progress}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderResolutions() {
+            const tbody = document.getElementById('resolutionsTableBody');
+            tbody.innerHTML = resolutionsData.map(res => {
+                const badgeClass = res.statusType === 'emerald'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : res.statusType === 'rose'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                    : 'bg-amber-50 text-amber-700 border-amber-200';
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3.5 px-4 font-mono font-bold text-navy-900 whitespace-nowrap">${res.num}</td>
+                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${res.date}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-800">${res.subject}</td>
+                        <td class="py-3.5 px-4 text-slate-600">${res.executor}</td>
+                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${res.votes}</td>
+                        <td class="py-3.5 px-4 whitespace-nowrap">
+                            <span class="border px-2.5 py-1 rounded-lg font-bold ${badgeClass}">${res.status}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const tenGrid = document.getElementById('tenMandatoryResolutions');
+            tenGrid.innerHTML = tenMandatoryList.map(text => `
+                <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200/80 flex items-start gap-2 text-xs">
+                    <i class="ph-fill ph-check-circle text-emerald-600 text-base shrink-0 mt-0.5"></i>
+                    <span class="font-bold text-slate-800 leading-snug">${text}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderUnderReview() {
+            const container = document.getElementById('underReviewGrid');
+            container.innerHTML = underReviewData.map(item => `
+                <div class="bg-white rounded-2xl p-5 shadow-sm border ${item.urgent ? 'border-rose-300 ring-1 ring-rose-100' : 'border-slate-200/80'} flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-xs font-bold bg-navy-900 text-white px-2.5 py-1 rounded-lg">${item.code}</span>
+                                ${item.urgent ? '<span class="text-[11px] font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg">اولویت خارج از نوبت (بند ۷ ماده ۷)</span>' : ''}
+                            </div>
+                            <span class="text-xs font-bold ${item.daysLeft <= 7 ? 'text-rose-700 bg-rose-50' : 'text-amber-700 bg-amber-50'} px-2.5 py-1 rounded-lg">
+                                مهلت کمیته: ${item.daysLeft} روز باقی‌مانده
+                            </span>
+                        </div>
+                        <h4 class="text-sm sm:text-base font-extrabold text-navy-900">${item.title}</h4>
+                        <p class="text-xs text-slate-500 mt-1">ارسال‌کننده: <strong>${item.sender}</strong> | وضعیت: ${item.auditStatus}</p>
+
+                        <div class="grid grid-cols-2 gap-3 my-4 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+                            <div>
+                                <span class="text-slate-500 block">ارزش وضع موجود:</span>
+                                <strong class="text-slate-800">${item.currentVal}</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">ارزش بالقوه پیشنهادی:</span>
+                                <strong class="text-emerald-700 font-black">${item.potentialVal}</strong>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-xs">
+                            <span class="font-bold text-navy-900 block mb-1">سناریوهای سه‌گانه پرونده تصمیم:</span>
+                            ${item.scenarios.map((sc, idx) => `
+                                <div class="p-2 rounded-lg ${idx === 0 ? 'bg-emerald-50/70 border border-emerald-200 font-semibold text-emerald-950' : 'bg-slate-50 text-slate-600'}">
+                                    ${sc}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <span class="text-[11px] text-slate-500">تأییدیه ارزیاب مستقل و ممیزی حقوقی</span>
+                        <button onclick="approveReviewItem('${item.code}', '${item.title}')" class="bg-navy-900 hover:bg-navy-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition cursor-pointer">
+                            ثبت در دستور جلسه کمیته
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderOrgsProjects() {
+            const tbody = document.getElementById('orgsProjectsTableBody');
+            tbody.innerHTML = orgsProjectsData.map(row => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-3.5 px-4 font-extrabold text-navy-900">${row.org}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-800">${row.project}</td>
+                    <td class="py-3.5 px-4 text-slate-600">${row.method}</td>
+                    <td class="py-3.5 px-4 font-black text-emerald-700 whitespace-nowrap">${row.value}</td>
+                    <td class="py-3.5 px-4 w-36">
+                        <div class="flex items-center gap-2">
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div class="bg-emerald-600 h-full rounded-full" style="width: ${row.physProg}%"></div>
+                            </div>
+                            <span class="font-bold text-slate-700">${row.physProg}٪</span>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4 w-36">
+                        <div class="flex items-center gap-2">
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-600 h-full rounded-full" style="width: ${row.finProg}%"></div>
+                            </div>
+                            <span class="font-bold text-slate-700">${row.finProg}٪</span>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-600">${row.share}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderRedLines() {
+            const list = document.getElementById('redLinesList');
+            list.innerHTML = redLinesData.map(line => `
+                <div class="p-3 rounded-xl bg-rose-50/70 border border-rose-200 flex items-start gap-2.5">
+                    <i class="ph-fill ph-prohibit text-rose-600 text-lg shrink-0 mt-0.5"></i>
+                    <span class="font-bold text-slate-800 leading-relaxed">${line}</span>
+                </div>
+            `).join('');
+        }
+
+        // =========================================================================
+        // مدیریت تب‌ها و مودال‌ها
+        // =========================================================================
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + tabName).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-navy-800/70', 'text-slate-200');
+            });
+
+            const activeBtn = document.getElementById('tab-btn-' + tabName);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('bg-navy-800/70', 'text-slate-200');
+        }
+
+        function openAssetDetail(assetId) {
+            const asset = assetsData.find(a => a.id === assetId);
+            if (!asset) return;
+
+            document.getElementById('modalAssetCode').textContent = asset.id;
+            document.getElementById('modalAssetTitle').textContent = asset.title;
+            document.getElementById('modalAssetOrg').textContent = asset.org;
+            document.getElementById('modalAssetCategory').textContent = asset.category;
+            document.getElementById('modalAssetCurrentVal').textContent = toPersianDigits(asset.currentVal) + ' میلیارد تومان';
+            document.getElementById('modalAssetPotentialVal').textContent = toPersianDigits(asset.potentialVal) + ' میلیارد تومان';
+            document.getElementById('modalAssetDesc').textContent = asset.desc;
+
+            const scenariosGrid = document.getElementById('modalScenariosGrid');
+            scenariosGrid.innerHTML = asset.scenarios.map(sc => `
+                <div class="p-4 rounded-2xl border ${sc.selected ? 'bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-200' : 'bg-slate-50 border-slate-200'} flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md ${sc.selected ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'}">
+                                ${sc.selected ? 'سناریوی منتخب' : 'سناریوی مقایسه'}
+                            </span>
+                        </div>
+                        <h5 class="font-extrabold text-navy-900 mb-1.5">${sc.name}</h5>
+                        <p class="text-slate-700 font-bold">برآورد عایدی: <span class="text-emerald-700">${sc.returnVal}</span></p>
+                    </div>
+                    <p class="mt-3 pt-2 border-t border-slate-200/80 text-[11px] font-semibold ${sc.selected ? 'text-emerald-800' : 'text-slate-500'}">
+                        وضعیت: ${sc.status}
+                    </p>
+                </div>
+            `).join('');
+
+            const modal = document.getElementById('assetDetailModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openRedLinesModal() {
+            const modal = document.getElementById('redLinesModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openNewAssetModal() {
+            const modal = document.getElementById('newAssetModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-navy-900 border-emerald-400' : 'bg-amber-900 border-amber-400';
+            toast.className = `${bgColor} text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border-r-4 flex items-center gap-2.5 transition-all duration-300`;
+            toast.innerHTML = `
+                <i class="ph-fill ph-check-circle text-emerald-400 text-lg shrink-0"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function approveReviewItem(code, title) {
+            showToast(`پرونده تصمیم ${code} (${title}) در دستور کار جلسه آتی کمیته عالی مولدسازی قرار گرفت.`);
+        }
+
+        function handleAddNewAsset(e) {
+            e.preventDefault();
+            const title = document.getElementById('newAssetTitle').value.trim();
+            const org = document.getElementById('newAssetOrg').value;
+            const category = document.getElementById('newAssetCategory').value;
+            const legalStatus = document.getElementById('newAssetLegal').value;
+            const currentVal = parseInt(document.getElementById('newAssetCurrent').value, 10);
+            const potentialVal = parseInt(document.getElementById('newAssetPotential').value, 10);
+            const desc = document.getElementById('newAssetDesc').value.trim() || 'شناسنامه‌دار شده در سامانه یکپارچه و آماده ارزیابی سناریوهای سه‌گانه.';
+
+            const newCode = `AST-1405-${101 + assetsData.length}`;
+            const legalBadge = legalStatus.includes('تک‌برگ') ? 'emerald' : legalStatus.includes('تغییر') ? 'amber' : 'rose';
+
+            const newItem = {
+                id: newCode,
+                title,
+                org,
+                category,
+                currentVal,
+                potentialVal,
+                legalStatus,
+                legalBadge,
+                desc,
+                scenarios: [
+                    { name: 'سناریو ۱: حفظ وضع موجود', returnVal: `${toPersianDigits(currentVal)} میلیارد ت`, status: 'پایه ارزیابی', selected: false },
+                    { name: `سناریو ۲: ${category} (پس از ارزش‌افزایی)`, returnVal: `${toPersianDigits(potentialVal)} میلیارد ت`, status: 'پیشنهاد اولیه PMO', selected: true },
+                    { name: 'سناریو ۳: اجاره بهره‌برداری میان‌مدت', returnVal: `${toPersianDigits(Math.round((currentVal + potentialVal) / 2))} میلیارد ت`, status: 'گزینه جایگزین', selected: false }
+                ]
+            };
+
+            assetsData.unshift(newItem);
+            saveAssetsToStorage();          // ذخیره در localStorage
+            renderAssetsTable();
+            updateKPIs();
+            closeModal('newAssetModal');
+            e.target.reset();
+            showToast(`شناسنامه استاندارد دارایی با کد یکتای ${newCode} ثبت شد و در دیتابیس ذخیره گردید.`);
+        }
+
+        // =========================================================================
+        // نمودارها
+        // =========================================================================
+
+        function initCharts() {
+            Chart.defaults.font.family = 'Vazirmatn';
+            Chart.defaults.color = '#475569';
+
+            const ctxPotential = document.getElementById('potentialValueChart').getContext('2d');
+            new Chart(ctxPotential, {
+                type: 'bar',
+                data: {
+                    labels: ['سبد مسکن ایثارگران', 'مشارکت و اجاره تجاری', 'املاک تملیکی و بازار سرمایه', 'مراکز درمانی و اقامتی', 'اراضی استان‌های پایلوت'],
+                    datasets: [
+                        {
+                            label: 'ارزش پایه وضع موجود (میلیارد تومان)',
+                            data: [12200, 8400, 6800, 5200, 5820],
+                            backgroundColor: '#94a3b8',
+                            borderRadius: 8,
+                            barPercentage: 0.65
+                        },
+                        {
+                            label: 'ارزش بالقوه پس از ارزش‌افزایی (میلیارد تومان)',
+                            data: [21900, 15400, 11200, 9100, 10850],
+                            backgroundColor: '#0f2342',
+                            borderRadius: 8,
+                            barPercentage: 0.65
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { usePointStyle: true, boxWidth: 8, font: { size: 11, weight: 'bold' } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 11 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+
+            const ctxCategories = document.getElementById('portfolioCategoriesChart').getContext('2d');
+            new Chart(ctxCategories, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'ورود به سبد مسکن ایثارگران (۳۲٪)',
+                        'مشارکت یا اجاره بلندمدت (۲۶٪)',
+                        'حفظ و ارتقای بهره‌وری (۱۵٪)',
+                        'توسعه مأموریتی و درمانی (۱۲٪)',
+                        'تهاتر هدفمند (۸٪)',
+                        'رفع موانع حقوقی و مازاد (۷٪)'
+                    ],
+                    datasets: [{
+                        data: [32, 26, 15, 12, 8, 7],
+                        backgroundColor: ['#059669', '#0f2342', '#2563eb', '#d97706', '#0d9488', '#94a3b8'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { usePointStyle: true, boxWidth: 8, font: { size: 10, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+
+            const ctxOrgs = document.getElementById('organizationsChart').getContext('2d');
+            new Chart(ctxOrgs, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'سازمان اقتصادی و اموال کوثر',
+                        'بانک دی و بیمه دی',
+                        'سازمان سیاحتی کوثر',
+                        'استان خراسان رضوی (پایلوت)',
+                        'استان اصفهان (پایلوت)',
+                        'شرکت متد و مؤسسه ایثار'
+                    ],
+                    datasets: [
+                        {
+                            label: 'ارزش پورتفوی در دست اجرا (میلیارد تومان)',
+                            data: [22500, 12400, 8950, 7900, 7400, 5600],
+                            backgroundColor: '#059669',
+                            borderRadius: 8,
+                            barPercentage: 0.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 11, weight: 'bold' } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // راه‌اندازی اولیه
+        window.onload = function () {
+            renderAssetsTable();
+            updateKPIs();
+            renderProjectsCards();
+            renderResolutions();
+            renderUnderReview();
+            renderOrgsProjects();
+            renderRedLines();
+            initCharts();
+        };
+    </script>
+</body>
+</html>
